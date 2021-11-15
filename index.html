@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Service Provider</title>
+    </head>
+    <body>
+        <div>
+            <h1>Annuaire</h1>
+            <input type="text" id="search" name="search">
+            <button type="button" id="searchButton">Search</button> 
+            <button type="button" id="listButton">All</button> 
+            <div id="resultDiv">
+
+            </div>
+        </div>
+
+        <script>
+            function display(data) {
+                const div = document.getElementById("resultDiv");
+                div.replaceChildren();
+                for(const element of data) {
+                    const row = document.createElement('div');
+                    row.innerHTML = Object.values(element).join(' - ');
+                    div.appendChild(row);
+                }
+
+            }
+
+            function list() {
+                fetch('http://localhost:3000')
+                .then( function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    display(data);
+                });
+            }
+            function search() {
+                let searchString = document.getElementById("search").value;
+                fetch('http://localhost:3000/search', {
+                    method: "post",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: searchString
+                    })
+                })
+                .then( function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    display(data);
+                });
+                document.getElementById("search").value = "";
+            }
+
+            const listBtn = document.getElementById('listButton');
+            listBtn.addEventListener('click', list);
+
+            const searchBtn = document.getElementById('searchButton');
+            searchBtn.addEventListener('click', search);
+        </script>
+    </body>
+</html>
